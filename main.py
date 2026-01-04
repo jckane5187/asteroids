@@ -45,7 +45,7 @@ def main():
             for shot in shots:
                 if shot.collides_with(roid):
                     log_event("asteroid_shot")
-                    roid.kill()
+                    roid.asteroid_split()
                     shot.kill()
         pygame.display.flip()
         clock.tick(60)
