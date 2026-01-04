@@ -38,10 +38,15 @@ def main():
         for ob in drawable:
             ob.draw(screen)
         for roid in asteroids:
-            if player.collides_with(roid) == True:
+            if player.collides_with(roid):
                 log_event("player_hit")
                 print("Game over!")
                 sys.exit()
+            for shot in shots:
+                if shot.collides_with(roid):
+                    log_event("asteroid_shot")
+                    roid.kill()
+                    shot.kill()
         pygame.display.flip()
         clock.tick(60)
         dt = (clock.tick(60) / 1000)
