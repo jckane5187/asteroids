@@ -24,7 +24,7 @@ def main():
     player = Player((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2))
     score = Scoreboard()
     field = AsteroidField()
-    
+    score_font = pygame.font.Font(None, 36)
 
     print(f"Starting Asteroids with pygame version: {pygame.version.ver}")
     print(f"Screen width: {SCREEN_WIDTH}")
@@ -51,6 +51,8 @@ def main():
                     score.asteroid_destroyed_score()
                     roid.asteroid_split()
                     shot.kill()
+        score_surface = score_font.render(f"Score: {score.score}", True, "white")
+        screen.blit(score_surface, (0,0))
         pygame.display.flip()
         clock.tick(60)
         dt = (clock.tick(60) / 1000)

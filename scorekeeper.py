@@ -6,4 +6,3 @@ class Scoreboard():
     
     def asteroid_destroyed_score(self):
         self.score += POINTS_PER_KILL
-        print(self.score)
