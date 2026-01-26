@@ -2,6 +2,7 @@ import pygame
 from circleshape import CircleShape
 from constants import PLAYER_RADIUS, LINE_WIDTH, PLAYER_TURN_SPEED, PLAYER_SPEED, PLAYER_SHOOT_SPEED, SHOT_RADIUS, PLAYER_SHOOT_COOLDOWN_SECONDS
 from shot import Shot
+from utils import position_wrap
 
 class Player(CircleShape):
     def __init__(self, x, y):
@@ -45,6 +46,8 @@ class Player(CircleShape):
                 return
             self.shoot()
             self.shot_cooldown = PLAYER_SHOOT_COOLDOWN_SECONDS
+        
+        self.position.x, self.position.y = position_wrap(self.position.x, self.position.y)
 
     def move(self, dt):
         unit_vector = pygame.Vector2(0, 1)

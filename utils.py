@@ -9,4 +9,5 @@ def position_wrap(x, y):
     if y > SCREEN_HEIGHT:
         y = 0
     if y < 0:
-        y = SCREEN_HEIGHT   
+        y = SCREEN_HEIGHT
+    return x, y
