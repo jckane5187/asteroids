@@ -14,7 +14,8 @@ class Asteroid(CircleShape):
         pygame.draw.circle(screen, "white", self.position, self.radius, LINE_WIDTH)
 
     def update(self, dt):
-        self.wrap_timer -= dt
+        if self.wrap_timer > 0:
+            self.wrap_timer -= dt
         self.position += self.velocity * dt
         if self.wrap_timer < 0:
             self.position.x, self.position.y = position_wrap(self.position.x, self.position.y)
