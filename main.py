@@ -7,6 +7,7 @@ from asteroid import Asteroid
 from asteroidfield import AsteroidField
 from shot import Shot
 from scorekeeper import Scoreboard
+from utils import kill_offscreen
 
 def main():
     pygame.init()
@@ -21,8 +22,8 @@ def main():
     Asteroid.containers = (asteroids, updatable, drawable)
     AsteroidField.containers = (updatable)
     Player.containers = (updatable, drawable)
-    player = Player((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2))
     score = Scoreboard()
+    player = Player((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2), scoreboard_ref=score)
     field = AsteroidField()
     score_font = pygame.font.Font(None, 36)
 
@@ -43,16 +44,21 @@ def main():
             if player.collides_with(roid):
                 log_event("player_hit")
                 print("Game over!")
-                print(f"Final Score: {score.score}")
+                print(f"Final Score: {score.score:.0f}")
                 sys.exit()
-            for shot in shots:
+        for shot in list(shots):
+            hit_asteroid = None
+            for roid in asteroids:
                 if shot.collides_with(roid):
-                    log_event("asteroid_shot")
-                    score.consecutive_multi_increase(roid.radius)
-                    score.asteroid_destroyed_score(roid.radius)
-                    roid.asteroid_split()
-                    shot.kill()
-        score_surface = score_font.render(f"Score: {score.score}", True, "white")
+                    hit_asteroid = roid
+                    break
+            if hit_asteroid:
+                log_event("asteroid_shot")
+                score.consecutive_multi_increase(hit_asteroid.radius)
+                score.asteroid_destroyed_score(hit_asteroid.radius)
+                hit_asteroid.asteroid_split()
+                shot.kill()
+        score_surface = score_font.render(f"Score: {score.score:.0f}", True, "white")
         screen.blit(score_surface, (0,0))
         pygame.display.flip()
         clock.tick(60)
