@@ -48,6 +48,7 @@ def main():
             for shot in shots:
                 if shot.collides_with(roid):
                     log_event("asteroid_shot")
+                    score.consecutive_multi_increase(roid.radius)
                     score.asteroid_destroyed_score(roid.radius)
                     roid.asteroid_split()
                     shot.kill()
