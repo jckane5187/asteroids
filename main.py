@@ -22,10 +22,12 @@ def main():
     Asteroid.containers = (asteroids, updatable, drawable)
     AsteroidField.containers = (updatable)
     Player.containers = (updatable, drawable)
-    score = Scoreboard()
-    player = Player((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2), scoreboard_ref=score)
     field = AsteroidField()
+    game_state = "PLAYING"
     score_font = pygame.font.Font(None, 36)
+    round_active = False
+    player = None
+    score = None
 
     print(f"Starting Asteroids with pygame version: {pygame.version.ver}")
     print(f"Screen width: {SCREEN_WIDTH}")
@@ -33,35 +35,62 @@ def main():
 
     while True:
         log_state()
-        for event in pygame.event.get():
+        for event in pygame.event.get(): # event handling
             if event.type == pygame.QUIT:
                 return
-        screen.fill("black")
+            if game_state == "MENU":
+                pass
+            elif game_state == "PLAYING":
+                pass
+            elif game_state == "GAME_OVER":
+                pass
+        # this is for updates
         updatable.update(dt)
+        if game_state == "MENU": 
+            pass
+        elif game_state == "PLAYING":
+            if not round_active:
+                score = Scoreboard()
+                player = Player((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2), scoreboard_ref=score)
+                round_active = True
+            for roid in asteroids:
+                if player.collides_with(roid):
+                    log_event("player_hit")
+                    print("Game over!")
+                    print(f"Final Score: {score.score:.0f}")
+                    sys.exit()
+            for shot in list(shots):
+                hit_asteroid = None
+                for roid in asteroids:
+                    if shot.collides_with(roid):
+                        hit_asteroid = roid
+                        break
+                if hit_asteroid:
+                    log_event("asteroid_shot")
+                    score.consecutive_multi_increase(hit_asteroid.radius)
+                    score.asteroid_destroyed_score(hit_asteroid.radius)
+                    hit_asteroid.asteroid_split()
+                    shot.kill()
+            pass
+        elif game_state == "GAME_OVER":
+            pass
+
+        # this is for drawing
+        screen.fill("black")
         for ob in drawable:
             ob.draw(screen)
-        for roid in asteroids:
-            if player.collides_with(roid):
-                log_event("player_hit")
-                print("Game over!")
-                print(f"Final Score: {score.score:.0f}")
-                sys.exit()
-        for shot in list(shots):
-            hit_asteroid = None
-            for roid in asteroids:
-                if shot.collides_with(roid):
-                    hit_asteroid = roid
-                    break
-            if hit_asteroid:
-                log_event("asteroid_shot")
-                score.consecutive_multi_increase(hit_asteroid.radius)
-                score.asteroid_destroyed_score(hit_asteroid.radius)
-                hit_asteroid.asteroid_split()
-                shot.kill()
-        score_surface = score_font.render(f"Score: {score.score:.0f}", True, "white")
-        multi_surface = score_font.render(f"Multi: {score.consecutive_multi:.1f}x", True, "white")
-        screen.blit(score_surface, (0,0))
-        screen.blit(multi_surface, (0,27))
+
+        if game_state == "MENU":
+            pass
+        elif game_state == "PLAYING":
+            score_surface = score_font.render(f"Score: {score.score:.0f}", True, "white")
+            multi_surface = score_font.render(f"Multi: {score.consecutive_multi:.1f}x", True, "white")
+            screen.blit(score_surface, (0,0))
+            screen.blit(multi_surface, (0,27))
+            pass
+        elif game_state == "GAME_OVER":
+            pass
+       
         pygame.display.flip()
         clock.tick(60)
         dt = (clock.tick(60) / 1000)
