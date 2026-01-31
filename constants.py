@@ -1,3 +1,5 @@
+import pygame
+
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 
@@ -19,3 +21,8 @@ SHOT_RADIUS = 5
 POINTS_PER_KILL = 100
 MAX_CONSEC_SHOT_MULTI = 5
 BASE_CONSEC_SHOT_MULTI_INC = 0.1
+
+pygame.font.init()
+SCORE_FONT = pygame.font.Font(None, 36)
+TITLE_FONT = pygame.font.Font(None, 144)
+MENU_FONT = pygame.font.Font(None, 72)

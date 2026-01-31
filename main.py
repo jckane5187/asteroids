@@ -1,6 +1,6 @@
 import pygame
 import sys
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, SCORE_FONT, TITLE_FONT, MENU_FONT
 from logger import log_state, log_event
 from player import Player
 from asteroid import Asteroid
@@ -24,7 +24,6 @@ def main():
     Player.containers = (updatable, drawable)
     field = AsteroidField()
     game_state = "MENU"
-    score_font = pygame.font.Font(None, 36)
     round_active = False
     player = None
     score = None
@@ -46,6 +45,7 @@ def main():
                 pass
             else:
                 raise Exception(f"Invalid game_state: {game_state}")
+            
         # this is for updates
         updatable.update(dt)
         if game_state == "MENU": 
@@ -85,10 +85,20 @@ def main():
             ob.draw(screen)
 
         if game_state == "MENU":
+            title_surface = TITLE_FONT.render("ASTEROIDS", True, "white")
+            title_rect = title_surface.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4))
+            screen.blit(title_surface, title_rect)
+            menu_play = MENU_FONT.render("PLAY", True, "white")
+            menu_play_rect = menu_play.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
+            screen.blit(menu_play, menu_play_rect)
+            menu_quit = MENU_FONT.render("QUIT", True, "white")
+            menu_quit_rect = menu_quit.get_rect(centerx=(SCREEN_WIDTH / 2))
+            menu_quit_rect.top = menu_play_rect.bottom + 36
+            screen.blit(menu_quit, menu_quit_rect)
             pass
         elif game_state == "PLAYING":
-            score_surface = score_font.render(f"Score: {score.score:.0f}", True, "white")
-            multi_surface = score_font.render(f"Multi: {score.consecutive_multi:.1f}x", True, "white")
+            score_surface = SCORE_FONT.render(f"Score: {score.score:.0f}", True, "white")
+            multi_surface = SCORE_FONT.render(f"Multi: {score.consecutive_multi:.1f}x", True, "white")
             screen.blit(score_surface, (0,0))
             screen.blit(multi_surface, (0,27))
             pass
