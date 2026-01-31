@@ -23,7 +23,7 @@ def main():
     AsteroidField.containers = (updatable)
     Player.containers = (updatable, drawable)
     field = AsteroidField()
-    game_state = "PLAYING"
+    game_state = "MENU"
     score_font = pygame.font.Font(None, 36)
     round_active = False
     player = None
@@ -44,6 +44,8 @@ def main():
                 pass
             elif game_state == "GAME_OVER":
                 pass
+            else:
+                raise Exception(f"Invalid game_state: {game_state}")
         # this is for updates
         updatable.update(dt)
         if game_state == "MENU": 
@@ -74,6 +76,8 @@ def main():
             pass
         elif game_state == "GAME_OVER":
             pass
+        else:
+            raise Exception(f"Invalid game_state: {game_state}")
 
         # this is for drawing
         screen.fill("black")
@@ -90,6 +94,8 @@ def main():
             pass
         elif game_state == "GAME_OVER":
             pass
+        else:
+            raise Exception(f"Invalid game_state: {game_state}")
        
         pygame.display.flip()
         clock.tick(60)
