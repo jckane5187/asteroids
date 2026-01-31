@@ -25,6 +25,10 @@ def main():
     field = AsteroidField()
     game_state = "MENU"
     round_active = False
+    menu_active = False
+    menu_ui_elements = {}
+    clicked_quit = False
+    clicked_play = False
     player = None
     score = None
 
@@ -37,19 +41,49 @@ def main():
         for event in pygame.event.get(): # event handling
             if event.type == pygame.QUIT:
                 return
+            
             if game_state == "MENU":
-                pass
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if menu_ui_elements["menu_quit_rect"].collidepoint(event.pos):
+                        clicked_quit = True
+                    elif menu_ui_elements["menu_play_rect"].collidepoint(event.pos):
+                        clicked_play = True
+                if event.type == pygame.MOUSEBUTTONUP:
+                    if menu_ui_elements["menu_quit_rect"].collidepoint(event.pos) and clicked_quit:
+                        clicked_quit = False
+                        return
+                    elif menu_ui_elements["menu_play_rect"].collidepoint(event.pos) and clicked_play:
+                        clicked_play = False
+                        for roid in asteroids:
+                            roid.kill()
+                        game_state = "PLAYING"
+                        round_active = False
+
             elif game_state == "PLAYING":
                 pass
+
             elif game_state == "GAME_OVER":
                 pass
+            
             else:
                 raise Exception(f"Invalid game_state: {game_state}")
             
         # this is for updates
         updatable.update(dt)
         if game_state == "MENU": 
-            pass
+            if menu_active == False:
+                menu_ui_elements["title_surface"] = TITLE_FONT.render("ASTEROIDS", True, "white")
+                menu_ui_elements["title_rect"] = menu_ui_elements["title_surface"].get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4))
+
+                menu_ui_elements["menu_play"] = MENU_FONT.render("PLAY", True, "white")
+                menu_ui_elements["menu_play_rect"] = menu_ui_elements["menu_play"].get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
+
+                menu_ui_elements["menu_quit"] = MENU_FONT.render("QUIT", True, "white")
+                menu_ui_elements["menu_quit_rect"] = menu_ui_elements["menu_quit"].get_rect(centerx=(SCREEN_WIDTH / 2))
+                menu_ui_elements["menu_quit_rect"].top = menu_ui_elements["menu_play_rect"].bottom + 36
+
+                menu_active = True
+
         elif game_state == "PLAYING":
             if not round_active:
                 score = Scoreboard()
@@ -73,9 +107,10 @@ def main():
                     score.asteroid_destroyed_score(hit_asteroid.radius)
                     hit_asteroid.asteroid_split()
                     shot.kill()
-            pass
+
         elif game_state == "GAME_OVER":
             pass
+
         else:
             raise Exception(f"Invalid game_state: {game_state}")
 
@@ -85,25 +120,20 @@ def main():
             ob.draw(screen)
 
         if game_state == "MENU":
-            title_surface = TITLE_FONT.render("ASTEROIDS", True, "white")
-            title_rect = title_surface.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4))
-            screen.blit(title_surface, title_rect)
-            menu_play = MENU_FONT.render("PLAY", True, "white")
-            menu_play_rect = menu_play.get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
-            screen.blit(menu_play, menu_play_rect)
-            menu_quit = MENU_FONT.render("QUIT", True, "white")
-            menu_quit_rect = menu_quit.get_rect(centerx=(SCREEN_WIDTH / 2))
-            menu_quit_rect.top = menu_play_rect.bottom + 36
-            screen.blit(menu_quit, menu_quit_rect)
-            pass
+            screen.blit(menu_ui_elements["title_surface"], menu_ui_elements["title_rect"])
+            screen.blit(menu_ui_elements["menu_play"], menu_ui_elements["menu_play_rect"])
+            screen.blit(menu_ui_elements["menu_quit"], menu_ui_elements["menu_quit_rect"])
+
         elif game_state == "PLAYING":
             score_surface = SCORE_FONT.render(f"Score: {score.score:.0f}", True, "white")
             multi_surface = SCORE_FONT.render(f"Multi: {score.consecutive_multi:.1f}x", True, "white")
             screen.blit(score_surface, (0,0))
             screen.blit(multi_surface, (0,27))
             pass
+
         elif game_state == "GAME_OVER":
             pass
+
         else:
             raise Exception(f"Invalid game_state: {game_state}")
        
