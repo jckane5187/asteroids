@@ -1,5 +1,4 @@
 import pygame
-import sys
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT, SCORE_FONT, TITLE_FONT, MENU_FONT
 from logger import log_state, log_event
 from player import Player
@@ -24,10 +23,7 @@ def main():
     Player.containers = (updatable, drawable)
     field = AsteroidField()
     game_state = "MENU"
-    state_flags = {"menu_active": False, "round_active": False, "game_over_active": False}
     round_active = False
-    menu_active = False
-    game_over_active = False
     menu_ui_elements = {}
     game_over_ui_elements = {}
     clicked_quit = False
@@ -106,8 +102,6 @@ def main():
             for roid in asteroids:
                 if player.collides_with(roid):
                     log_event("player_hit")
-                    print("Game over!")
-                    print(f"Final Score: {score.score:.0f}")
                     player.kill()
                     for shot in shots:
                         shot.kill()
@@ -152,6 +146,7 @@ def main():
 
         elif game_state == "GAME_OVER":
             screen.blit(game_over_ui_elements["title_surface"], game_over_ui_elements["title_rect"])
+            screen.blit(game_over_ui_elements["final_score_surface"], game_over_ui_elements["final_score_rect"])
             screen.blit(game_over_ui_elements["menu_play"], game_over_ui_elements["menu_play_rect"])
             screen.blit(game_over_ui_elements["menu_quit"], game_over_ui_elements["menu_quit_rect"])
 

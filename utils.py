@@ -1,6 +1,7 @@
 import pygame
 from constants import SCREEN_HEIGHT, SCREEN_WIDTH, TITLE_FONT, MENU_FONT
 
+
 def position_wrap(x, y):
     if x < 0:
         x = SCREEN_WIDTH
@@ -48,6 +49,10 @@ def set_game_state(new_state, player, score, asteroids, shots, ui_elements_dict=
     elif new_state == "GAME_OVER":
         ui_elements_dict["title_surface"] = TITLE_FONT.render("GAME OVER", True, "white")
         ui_elements_dict["title_rect"] = ui_elements_dict["title_surface"].get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4))
+
+        ui_elements_dict["final_score_surface"] = MENU_FONT.render(f"Final Score: {score.score:.0f}", True, "white")
+        ui_elements_dict["final_score_rect"] = ui_elements_dict["final_score_surface"].get_rect(centerx=(SCREEN_WIDTH / 2))
+        ui_elements_dict["final_score_rect"].top = ui_elements_dict["title_rect"].bottom
 
         ui_elements_dict["menu_play"] = MENU_FONT.render("PLAY", True, "white")
         ui_elements_dict["menu_play_rect"] = ui_elements_dict["menu_play"].get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
