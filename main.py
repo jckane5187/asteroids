@@ -7,7 +7,7 @@ from asteroid import Asteroid
 from asteroidfield import AsteroidField
 from shot import Shot
 from scorekeeper import Scoreboard
-from utils import kill_offscreen
+from utils import set_game_state
 
 def main():
     pygame.init()
@@ -24,13 +24,19 @@ def main():
     Player.containers = (updatable, drawable)
     field = AsteroidField()
     game_state = "MENU"
+    state_flags = {"menu_active": False, "round_active": False, "game_over_active": False}
     round_active = False
     menu_active = False
+    game_over_active = False
     menu_ui_elements = {}
+    game_over_ui_elements = {}
     clicked_quit = False
     clicked_play = False
     player = None
     score = None
+
+    game_state, player, score, asteroids, shots, menu_ui_elements = \
+        set_game_state("MENU", player, score, asteroids, shots, menu_ui_elements)
 
     print(f"Starting Asteroids with pygame version: {pygame.version.ver}")
     print(f"Screen width: {SCREEN_WIDTH}")
@@ -54,38 +60,46 @@ def main():
                         return
                     elif menu_ui_elements["menu_play_rect"].collidepoint(event.pos) and clicked_play:
                         clicked_play = False
-                        for roid in asteroids:
-                            roid.kill()
-                        game_state = "PLAYING"
-                        round_active = False
+                        game_state, player, score, asteroids, shots = \
+                            set_game_state("PLAYING", player, score, asteroids, shots)
+                    else:
+                        clicked_play = False
+                        clicked_quit = False
 
             elif game_state == "PLAYING":
                 pass
 
             elif game_state == "GAME_OVER":
-                pass
-            
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if game_over_ui_elements["menu_quit_rect"].collidepoint(event.pos):
+                        clicked_quit = True
+                    elif game_over_ui_elements["menu_play_rect"].collidepoint(event.pos):
+                        clicked_play = True
+                if event.type == pygame.MOUSEBUTTONUP:
+                    if game_over_ui_elements["menu_quit_rect"].collidepoint(event.pos) and clicked_quit:
+                        clicked_quit = False
+                        return
+                    elif game_over_ui_elements["menu_play_rect"].collidepoint(event.pos) and clicked_play:
+                        clicked_play = False
+                        for roid in asteroids:
+                            roid.kill()
+                        game_state, player, score, asteroids, shots = \
+                            set_game_state("PLAYING", player, score, asteroids, shots)
+                        round_active = False
+                    else:
+                        clicked_play = False
+                        clicked_quit = False
+
             else:
                 raise Exception(f"Invalid game_state: {game_state}")
             
         # this is for updates
         updatable.update(dt)
         if game_state == "MENU": 
-            if menu_active == False:
-                menu_ui_elements["title_surface"] = TITLE_FONT.render("ASTEROIDS", True, "white")
-                menu_ui_elements["title_rect"] = menu_ui_elements["title_surface"].get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4))
-
-                menu_ui_elements["menu_play"] = MENU_FONT.render("PLAY", True, "white")
-                menu_ui_elements["menu_play_rect"] = menu_ui_elements["menu_play"].get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
-
-                menu_ui_elements["menu_quit"] = MENU_FONT.render("QUIT", True, "white")
-                menu_ui_elements["menu_quit_rect"] = menu_ui_elements["menu_quit"].get_rect(centerx=(SCREEN_WIDTH / 2))
-                menu_ui_elements["menu_quit_rect"].top = menu_ui_elements["menu_play_rect"].bottom + 36
-
-                menu_active = True
+            pass
 
         elif game_state == "PLAYING":
-            if not round_active:
+            if round_active == False:
                 score = Scoreboard()
                 player = Player((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2), scoreboard_ref=score)
                 round_active = True
@@ -94,7 +108,12 @@ def main():
                     log_event("player_hit")
                     print("Game over!")
                     print(f"Final Score: {score.score:.0f}")
-                    sys.exit()
+                    player.kill()
+                    for shot in shots:
+                        shot.kill()
+                    game_state, player, score, asteroids, shots, game_over_ui_elements = \
+                        set_game_state("GAME_OVER", player, score, asteroids, shots, game_over_ui_elements)
+                    round_active = False
             for shot in list(shots):
                 hit_asteroid = None
                 for roid in asteroids:
@@ -132,7 +151,9 @@ def main():
             pass
 
         elif game_state == "GAME_OVER":
-            pass
+            screen.blit(game_over_ui_elements["title_surface"], game_over_ui_elements["title_rect"])
+            screen.blit(game_over_ui_elements["menu_play"], game_over_ui_elements["menu_play_rect"])
+            screen.blit(game_over_ui_elements["menu_quit"], game_over_ui_elements["menu_quit_rect"])
 
         else:
             raise Exception(f"Invalid game_state: {game_state}")
