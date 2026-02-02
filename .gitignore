@@ -7,6 +7,8 @@ wheels/
 *.egg-info
 game_state.jsonl
 game_events.jsonl
+.vscode/
+main.spec
 
 # Virtual environments
 .venv
