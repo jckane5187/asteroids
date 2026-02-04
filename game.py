@@ -16,7 +16,6 @@ class Game():
         self.drawable = pygame.sprite.Group()
         self.asteroids = pygame.sprite.Group()
         self.shots = pygame.sprite.Group()
-        self.field = AsteroidField()
         self.game_state = "MENU"
         self.menu_ui_elements = {}
         self.game_over_ui_elements = {}
@@ -28,6 +27,7 @@ class Game():
         Asteroid.containers = (self.asteroids, self.updatable, self.drawable)
         AsteroidField.containers = (self.updatable)
         Player.containers = (self.updatable, self.drawable)
+        self.field = AsteroidField()
         self.set_state("MENU")
         self._quit_game = False
         
