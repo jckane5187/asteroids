@@ -10,6 +10,11 @@ class Player(CircleShape):
         self.rotation = 0
         self.shot_cooldown = 0
         self.scoreboard = scoreboard_ref
+        self.rotating_left = False
+        self.rotating_right = False
+        self.accelerating_forward = False
+        self.accelerating_backward = False
+        self.shooting = False
     
     # in the Player class
     def triangle(self):
@@ -27,22 +32,21 @@ class Player(CircleShape):
         self.rotation = self.rotation + (PLAYER_TURN_SPEED * dt)
     
     def update(self, dt):
-        keys = pygame.key.get_pressed()
         self.shot_cooldown -= dt
 
-        if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+        if self.rotating_left:
             self.rotate(-dt)
         
-        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+        if self.rotating_right:
             self.rotate(dt)
 
-        if keys[pygame.K_w] or keys[pygame.K_UP]:
+        if self.accelerating_forward:
             self.move(dt)
 
-        if keys[pygame.K_s] or keys[pygame.K_DOWN]:
+        if self.accelerating_backward:
             self.move(-dt)
 
-        if keys[pygame.K_SPACE]:
+        if self.shooting:
             if self.shot_cooldown > 0:
                 return
             self.shoot()
@@ -61,4 +65,33 @@ class Player(CircleShape):
         base_vel = pygame.Vector2(0, 1)
         rotated_vel = base_vel.rotate(self.rotation)
         bullet.velocity = rotated_vel * PLAYER_SHOOT_SPEED
+    
+    def start_rotating_left(self):
+        self.rotating_left = True
+    
+    def stop_rotating_left(self):
+        self.rotating_left = False
 
+    def start_rotating_right(self):
+        self.rotating_right = True
+    
+    def stop_rotating_right(self):
+        self.rotating_right = False
+
+    def start_accelerating_forward(self):
+        self.accelerating_forward = True
+    
+    def stop_accelerating_forward(self):
+        self.accelerating_forward = False
+
+    def start_accelerating_backward(self):
+        self.accelerating_backward = True
+    
+    def stop_accelerating_backward(self):
+        self.accelerating_backward = False
+
+    def start_shooting(self):
+        self.shooting = True
+    
+    def stop_shooting(self):
+        self.shooting = False

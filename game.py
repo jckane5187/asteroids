@@ -104,45 +104,113 @@ class Game():
                 return
             
             if self.game_state == "MENU":
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if self.menu_ui_elements["menu_quit_rect"].collidepoint(event.pos):
-                        self.clicked_quit = True
-                    elif self.menu_ui_elements["menu_play_rect"].collidepoint(event.pos):
-                        self.clicked_play = True
-                if event.type == pygame.MOUSEBUTTONUP:
-                    if self.menu_ui_elements["menu_quit_rect"].collidepoint(event.pos) and self.clicked_quit:
-                        self.clicked_quit = False
-                        self._quit_game = True
-                        return
-                    elif self.menu_ui_elements["menu_play_rect"].collidepoint(event.pos) and self.clicked_play:
-                        self.clicked_play = False
-                        self.set_state("PLAYING")
-                    else:
-                        self.clicked_play = False
-                        self.clicked_quit = False
+                self._handle_menu_input(event)
 
             elif self.game_state == "PLAYING":
-                pass
+                self._handle_playing_input(event)
 
             elif self.game_state == "GAME_OVER":
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if self.game_over_ui_elements["menu_quit_rect"].collidepoint(event.pos):
-                        self.clicked_quit = True
-                    elif self.game_over_ui_elements["menu_play_rect"].collidepoint(event.pos):
-                        self.clicked_play = True
-                if event.type == pygame.MOUSEBUTTONUP:
-                    if self.game_over_ui_elements["menu_quit_rect"].collidepoint(event.pos) and self.clicked_quit:
-                        self.clicked_quit = False
-                        self._quit_game = True
-                        return
-                    elif self.game_over_ui_elements["menu_play_rect"].collidepoint(event.pos) and self.clicked_play:
-                        self.clicked_play = False
-                        for roid in self.asteroids:
-                            roid.kill()
-                        self.set_state("PLAYING")
-                    else:
-                        self.clicked_play = False
-                        self.clicked_quit = False
+                self._handle_game_over_input(event)
 
             else:
                 raise Exception(f"Invalid game_state: {self.game_state}")
+    
+    def _handle_menu_input(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.menu_ui_elements["menu_quit_rect"].collidepoint(event.pos):
+                self.clicked_quit = True
+            elif self.menu_ui_elements["menu_play_rect"].collidepoint(event.pos):
+                self.clicked_play = True
+        if event.type == pygame.MOUSEBUTTONUP:
+            if self.menu_ui_elements["menu_quit_rect"].collidepoint(event.pos) and self.clicked_quit:
+                self.clicked_quit = False
+                self._quit_game = True
+                return
+            elif self.menu_ui_elements["menu_play_rect"].collidepoint(event.pos) and self.clicked_play:
+                self.clicked_play = False
+                self.set_state("PLAYING")
+            else:
+                self.clicked_play = False
+                self.clicked_quit = False
+    
+    def _handle_playing_input(self, event):
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_a or event.key == pygame.K_LEFT:
+                self.player.start_rotating_left()
+            elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+                self.player.start_rotating_right()
+            elif event.key == pygame.K_w or event.key == pygame.K_UP:
+                self.player.start_accelerating_forward()
+            elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
+                self.player.start_accelerating_backward()
+            elif event.key == pygame.K_SPACE:
+                self.player.start_shooting()
+        
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_a or event.key == pygame.K_LEFT:
+                self.player.stop_rotating_left()
+            elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+                self.player.stop_rotating_right()
+            elif event.key == pygame.K_w or event.key == pygame.K_UP:
+                self.player.stop_accelerating_forward()
+            elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
+                self.player.stop_accelerating_backward()
+            elif event.key == pygame.K_SPACE:
+                self.player.stop_shooting()
+
+    def _handle_game_over_input(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.game_over_ui_elements["menu_quit_rect"].collidepoint(event.pos):
+                self.clicked_quit = True
+            elif self.game_over_ui_elements["menu_play_rect"].collidepoint(event.pos):
+                self.clicked_play = True
+        if event.type == pygame.MOUSEBUTTONUP:
+            if self.game_over_ui_elements["menu_quit_rect"].collidepoint(event.pos) and self.clicked_quit:
+                self.clicked_quit = False
+                self._quit_game = True
+                return
+            elif self.game_over_ui_elements["menu_play_rect"].collidepoint(event.pos) and self.clicked_play:
+                self.clicked_play = False
+                for roid in self.asteroids:
+                    roid.kill()
+                self.set_state("PLAYING")
+            else:
+                self.clicked_play = False
+                self.clicked_quit = False
+    
+    def _update(self):
+        log_state()
+        self.updatable.update(self.dt)
+        if self.game_state == "MENU": 
+            pass
+
+        elif self.game_state == "PLAYING":
+            for roid in self.asteroids:
+                if self.player.collides_with(roid):
+                    log_event("player_hit")
+                    self.player.kill()
+                    for shot in self.shots:
+                        shot.kill()
+                    self.set_state("GAME_OVER")
+                    return
+            for shot in list(self.shots):
+                hit_asteroid = None
+                for roid in self.asteroids:
+                    if shot.collides_with(roid):
+                        hit_asteroid = roid
+                        break
+                if hit_asteroid:
+                    log_event("asteroid_shot")
+                    self.score.consecutive_multi_increase(hit_asteroid.radius)
+                    self.score.asteroid_destroyed_score(hit_asteroid.radius)
+                    hit_asteroid.asteroid_split()
+                    shot.kill()
+
+        elif self.game_state == "GAME_OVER":
+            pass
+
+        else:
+            raise Exception(f"Invalid game_state: {self.game_state}")
+
+    def _draw(self):
+        pass
