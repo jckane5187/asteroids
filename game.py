@@ -213,4 +213,29 @@ class Game():
             raise Exception(f"Invalid game_state: {self.game_state}")
 
     def _draw(self):
-        pass
+        self.screen.fill("black")
+        for ob in self.drawable:
+            ob.draw(self.screen)
+
+        if self.game_state == "MENU":
+            self.screen.blit(self.menu_ui_elements["title_surface"], self.menu_ui_elements["title_rect"])
+            self.screen.blit(self.menu_ui_elements["menu_play"], self.menu_ui_elements["menu_play_rect"])
+            self.screen.blit(self.menu_ui_elements["menu_quit"], self.menu_ui_elements["menu_quit_rect"])
+
+        elif self.game_state == "PLAYING":
+            score_surface = SCORE_FONT.render(f"Score: {self.score.score:.0f}", True, "white")
+            multi_surface = SCORE_FONT.render(f"Multi: {self.score.consecutive_multi:.1f}x", True, "white")
+            self.screen.blit(score_surface, (0,0))
+            self.screen.blit(multi_surface, (0,27))
+            pass
+
+        elif self.game_state == "GAME_OVER":
+            self.screen.blit(self.game_over_ui_elements["title_surface"], self.game_over_ui_elements["title_rect"])
+            self.screen.blit(self.game_over_ui_elements["final_score_surface"], self.game_over_ui_elements["final_score_rect"])
+            self.screen.blit(self.game_over_ui_elements["menu_play"], self.game_over_ui_elements["menu_play_rect"])
+            self.screen.blit(self.game_over_ui_elements["menu_quit"], self.game_over_ui_elements["menu_quit_rect"])
+
+        else:
+            raise Exception(f"Invalid game_state: {self.game_state}")
+       
+        pygame.display.flip()
