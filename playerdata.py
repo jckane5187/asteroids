@@ -25,7 +25,7 @@ class PlayerData:
             return cls()
 
         try:
-            with open(filepath, "r") as f:
+            with open(filepath, 'r') as f:
                 loaded_dict = json.load(f)
             
             player_data = cls()
@@ -46,3 +46,17 @@ class PlayerData:
         except Exception as e:
             print(f"An unexpected error occurred while loading player data: {e}. Creating new player data.")
             return cls()
+    
+    def save_data(self, filepath):
+        try:
+            directory = os.path.dirname(filepath)
+            if directory and not os.path.exists(directory):
+                os.makedirs(directory)
+            
+            with open(filepath, 'w') as f:
+                json.dump(self.__dict__, f, indent=4)
+            
+            print(f"Player data saved successfully to {filepath}.")
+
+        except Exception as e:
+            print(f"An error occurred while saving player data to {filepath}: {e}")
