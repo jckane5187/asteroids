@@ -26,3 +26,5 @@ pygame.font.init()
 SCORE_FONT = pygame.font.Font(None, 36)
 TITLE_FONT = pygame.font.Font(None, 144)
 MENU_FONT = pygame.font.Font(None, 72)
+
+SAVE_FILE = "player_data.json"

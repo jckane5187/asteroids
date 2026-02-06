@@ -9,6 +9,7 @@ game_state.jsonl
 game_events.jsonl
 .vscode/
 main.spec
+player_data.json
 
 # Virtual environments
 .venv

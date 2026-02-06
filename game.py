@@ -1,11 +1,12 @@
 import pygame
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT, SCORE_FONT, TITLE_FONT, MENU_FONT
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, SCORE_FONT, TITLE_FONT, MENU_FONT, SAVE_FILE
 from logger import log_state, log_event
 from player import Player
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
 from shot import Shot
 from scorekeeper import Scoreboard
+from playerdata import PlayerData
 
 class Game():
     def __init__(self):
@@ -28,6 +29,7 @@ class Game():
         AsteroidField.containers = (self.updatable)
         Player.containers = (self.updatable, self.drawable)
         self.field = AsteroidField()
+        self.player_data = PlayerData.load_data(SAVE_FILE)
         self.set_state("MENU")
         self._quit_game = False
         
@@ -86,14 +88,18 @@ class Game():
             raise Exception(f"Invalid game_state: {new_state}")
         
     def run(self):
-        while True:
+        running = True
+        while running:
             self._handle_input()
             self._update()
             self._draw()
             self._tick()
 
             if self._quit_game:
-                return
+                running = False
+        
+        self.player_data.save_data(SAVE_FILE)
+        return
     
     def _tick(self):
         self.dt = (self.clock.tick(60) / 1000)
@@ -191,6 +197,7 @@ class Game():
                     self.player.kill()
                     for shot in self.shots:
                         shot.kill()
+                    self.player_data.save_data(SAVE_FILE)
                     self.set_state("GAME_OVER")
                     return
             for shot in list(self.shots):
