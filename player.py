@@ -5,16 +5,16 @@ from shot import Shot
 from utils import position_wrap
 
 class Player(CircleShape):
-    def __init__(self, x, y, scoreboard_ref):
+    def __init__(self, x, y):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
         self.shot_cooldown = 0
-        self.scoreboard = scoreboard_ref
         self.rotating_left = False
         self.rotating_right = False
         self.accelerating_forward = False
         self.accelerating_backward = False
         self.shooting = False
+        self.just_shot = False
     
     # in the Player class
     def triangle(self):
@@ -33,6 +33,7 @@ class Player(CircleShape):
     
     def update(self, dt):
         self.shot_cooldown -= dt
+        self.just_shot = False
 
         if self.rotating_left:
             self.rotate(-dt)
@@ -51,6 +52,7 @@ class Player(CircleShape):
                 return
             self.shoot()
             self.shot_cooldown = PLAYER_SHOOT_COOLDOWN_SECONDS
+            self.just_shot = True
         
         self.position.x, self.position.y = position_wrap(self.position.x, self.position.y)
 
@@ -61,7 +63,7 @@ class Player(CircleShape):
         self.position += rotated_with_speed
 
     def shoot(self):
-        bullet = Shot(self.position, self.position, SHOT_RADIUS, self.scoreboard)
+        bullet = Shot(self.position, self.position, SHOT_RADIUS)
         base_vel = pygame.Vector2(0, 1)
         rotated_vel = base_vel.rotate(self.rotation)
         bullet.velocity = rotated_vel * PLAYER_SHOOT_SPEED

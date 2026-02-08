@@ -7,6 +7,8 @@ from asteroidfield import AsteroidField
 from shot import Shot
 from scorekeeper import Scoreboard
 from playerdata import PlayerData
+from round import Round
+from utils import kill_offscreen
 
 class Game():
     def __init__(self):
@@ -24,6 +26,7 @@ class Game():
         self.clicked_play = False
         self.player = None
         self.score = None
+        self.current_round = None
         Shot.containers = (self.shots, self.drawable, self.updatable)
         Asteroid.containers = (self.asteroids, self.updatable, self.drawable)
         AsteroidField.containers = (self.updatable)
@@ -64,7 +67,10 @@ class Game():
                 roid.kill()
             self.shots.empty()
             self.score = Scoreboard()
-            self.player = Player((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2), scoreboard_ref=self.score)
+            self.current_round = Round()
+            self.player = Player((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2))
+            
+            log_event(f"round {self.current_round.round_number} started")
             
 
         elif new_state == "GAME_OVER":
@@ -191,16 +197,27 @@ class Game():
             pass
 
         elif self.game_state == "PLAYING":
+            self.current_round.time_elapsed(self.dt)
+            if self.player.just_shot:
+                self.current_round.increase_shot_fired()
+                self.current_round.increase_shot_chain()
             for roid in self.asteroids:
                 if self.player.collides_with(roid):
                     log_event("player_hit")
+                    log_event(f"round {self.current_round.round_number} ended")
                     self.player.kill()
                     for shot in self.shots:
                         shot.kill()
+                    self.current_round.compare_longest_chain_and_reset()
+                    self.current_round.set_score(self.score.score)
                     self.player_data.save_data(SAVE_FILE)
                     self.set_state("GAME_OVER")
                     return
             for shot in list(self.shots):
+                if kill_offscreen(shot.position.x, shot.position.y, shot):
+                    self.score.reset_consecutive_multi()
+                    log_event(f"shot {shot.id} missed! consecutive shot multi reset")
+                    self.current_round.compare_longest_chain_and_reset()
                 hit_asteroid = None
                 for roid in self.asteroids:
                     if shot.collides_with(roid):
@@ -210,6 +227,7 @@ class Game():
                     log_event("asteroid_shot")
                     self.score.consecutive_multi_increase(hit_asteroid.radius)
                     self.score.asteroid_destroyed_score(hit_asteroid.radius)
+                    self.current_round.update_asteroid_destroyed(hit_asteroid.radius)
                     hit_asteroid.asteroid_split()
                     shot.kill()
 
