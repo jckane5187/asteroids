@@ -210,6 +210,7 @@ class Game():
                         shot.kill()
                     self.current_round.compare_longest_chain_and_reset()
                     self.current_round.set_score(self.score.score)
+                    self.player_data.collect_and_record_round_data(self.current_round)
                     self.player_data.save_data(SAVE_FILE)
                     self.set_state("GAME_OVER")
                     return

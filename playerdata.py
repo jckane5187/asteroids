@@ -1,6 +1,7 @@
 import json
 import os
 from datetime import datetime
+from constants import SIZE_SMALL, SIZE_MEDIUM, SIZE_LARGE
 
 class PlayerData:
     def __init__(self):
@@ -9,7 +10,7 @@ class PlayerData:
         self.total_score_earned = 0
 
         self.total_asteroids_destroyed = 0
-        self.asteroids_destroyed_by_size = {}
+        self.asteroids_destroyed_by_size = {SIZE_SMALL: 0, SIZE_MEDIUM: 0, SIZE_LARGE: 0}
         self.total_shots_fired = 0
 
         self.longest_round = 0.0 # seconds
@@ -60,3 +61,32 @@ class PlayerData:
 
         except Exception as e:
             print(f"An error occurred while saving player data to {filepath}: {e}")
+
+    def collect_and_record_round_data(self, round):
+        self.total_time_played += round.round_time
+        self.total_rounds_played += 1
+        self.total_score_earned += round.round_score
+        self.total_asteroids_destroyed += round.round_asteroids_destroyed
+        
+        for key in round.round_asteroids_destroyed_by_size:
+            if key not in self.asteroids_destroyed_by_size:
+                self.asteroids_destroyed_by_size[key] = 0
+            self.asteroids_destroyed_by_size[key] += round.round_asteroids_destroyed_by_size[key]
+        
+        self.total_shots_fired += round.round_shots_fired
+
+        if round.round_time > self.longest_round:
+            self.longest_round = round.round_time
+        
+        if round.round_score > self.highest_single_round_score:
+            self.highest_single_round_score = round.round_score
+        
+        if round.longest_consecutive_shot_chain > self.longest_consecutive_shot_chain:
+            self.longest_consecutive_shot_chain = round.longest_consecutive_shot_chain
+        
+        if round.round_asteroids_destroyed > self.most_asteroids_destroyed_single_round:
+            self.most_asteroids_destroyed_single_round = round.round_asteroids_destroyed
+            self.most_asteroids_destroyed_by_size_single_round.clear()
+            self.most_asteroids_destroyed_by_size_single_round = round.round_asteroids_destroyed_by_size
+
+
