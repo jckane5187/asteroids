@@ -22,11 +22,13 @@ class Game():
         self.game_state = "MENU"
         self.menu_ui_elements = {}
         self.game_over_ui_elements = {}
+        self.stats_ui_elements = {}
         self.clicked_quit = False
         self.clicked_play = False
         self.player = None
         self.score = None
         self.current_round = None
+        self.previous_state = None
         Shot.containers = (self.shots, self.drawable, self.updatable)
         Asteroid.containers = (self.asteroids, self.updatable, self.drawable)
         AsteroidField.containers = (self.updatable)
@@ -89,6 +91,15 @@ class Game():
             self.game_over_ui_elements["menu_quit"] = MENU_FONT.render("QUIT", True, "white")
             self.game_over_ui_elements["menu_quit_rect"] = self.game_over_ui_elements["menu_quit"].get_rect(centerx=(SCREEN_WIDTH / 2))
             self.game_over_ui_elements["menu_quit_rect"].top = self.game_over_ui_elements["menu_play_rect"].bottom + 36
+
+        elif new_state == "STATS": # depending on the size, this may require the ability to scroll through through the stats. I will initially try to keep it
+            # to a small enough area, but need to be prepared to either learn how to do it, or download a library to handle it for me
+            self.stats_ui_elements.clear()
+            # templates
+            # self.stats_ui_elements["thing"] = font_constant.render("WORD", True, "White")
+            # self.stats_ui_elements["thing_rect"] = self.stats_ui_elements["thing"].get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4))
+            self.stats_ui_elements["title_surface"] = TITLE_FONT.render("STATS", True, "White")
+            self.stats_ui_elements["title_rect"] = self.stats_ui_elements["title_surface"].get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4))
         
         else:
             raise Exception(f"Invalid game_state: {new_state}")
