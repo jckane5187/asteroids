@@ -25,6 +25,8 @@ class Game():
         self.stats_ui_elements = {}
         self.clicked_quit = False
         self.clicked_play = False
+        self.clicked_stats = False
+        self.clicked_return = False
         self.player = None
         self.score = None
         self.current_round = None
@@ -43,6 +45,7 @@ class Game():
         print(f"Screen height: {SCREEN_HEIGHT}")
 
     def set_state(self, new_state):
+        self.previous_state = self.game_state
         self.game_state = new_state
 
         if new_state == "MENU":
@@ -54,9 +57,13 @@ class Game():
             self.menu_ui_elements["menu_play"] = MENU_FONT.render("PLAY", True, "white")
             self.menu_ui_elements["menu_play_rect"] = self.menu_ui_elements["menu_play"].get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
 
+            self.menu_ui_elements["menu_stats"] = MENU_FONT.render("STATS", True, "white")
+            self.menu_ui_elements["menu_stats_rect"] = self.menu_ui_elements["menu_stats"].get_rect(centerx=(SCREEN_WIDTH / 2))
+            self.menu_ui_elements["menu_stats_rect"].top = self.menu_ui_elements["menu_play_rect"].bottom + 36
+
             self.menu_ui_elements["menu_quit"] = MENU_FONT.render("QUIT", True, "white")
             self.menu_ui_elements["menu_quit_rect"] = self.menu_ui_elements["menu_quit"].get_rect(centerx=(SCREEN_WIDTH / 2))
-            self.menu_ui_elements["menu_quit_rect"].top = self.menu_ui_elements["menu_play_rect"].bottom + 36
+            self.menu_ui_elements["menu_quit_rect"].top = self.menu_ui_elements["menu_stats_rect"].bottom + 36
 
             for roid in self.asteroids:
                 roid.kill()
@@ -140,7 +147,7 @@ class Game():
             # Clickable Button
             self.stats_ui_elements["stats_return"] = MENU_FONT.render("RETURN", True, "white")
             self.stats_ui_elements["stats_return_rect"] = self.stats_ui_elements["stats_return"].get_rect(center=(SCREEN_WIDTH * (7 / 8), SCREEN_HEIGHT * (7 / 8)))
-
+            
         
         else:
             raise Exception(f"Invalid game_state: {new_state}")
@@ -165,6 +172,7 @@ class Game():
     def _handle_input(self):
         for event in pygame.event.get(): # event handling
             if event.type == pygame.QUIT:
+                self._quit_game = True
                 return
             
             if self.game_state == "MENU":
@@ -188,6 +196,8 @@ class Game():
                 self.clicked_quit = True
             elif self.menu_ui_elements["menu_play_rect"].collidepoint(event.pos):
                 self.clicked_play = True
+            elif self.menu_ui_elements["menu_stats_rect"].collidepoint(event.pos):
+                self.clicked_stats = True
         if event.type == pygame.MOUSEBUTTONUP:
             if self.menu_ui_elements["menu_quit_rect"].collidepoint(event.pos) and self.clicked_quit:
                 self.clicked_quit = False
@@ -196,8 +206,12 @@ class Game():
             elif self.menu_ui_elements["menu_play_rect"].collidepoint(event.pos) and self.clicked_play:
                 self.clicked_play = False
                 self.set_state("PLAYING")
+            elif self.menu_ui_elements["menu_stats_rect"].collidepoint(event.pos) and self.clicked_stats:
+                self.clicked_stats = False
+                self.set_state("STATS")
             else:
                 self.clicked_play = False
+                self.clicked_stats = False
                 self.clicked_quit = False
     
     def _handle_playing_input(self, event):
@@ -246,7 +260,16 @@ class Game():
                 self.clicked_quit = False
 
     def _handle_stats_input(self, event):
-        pass
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.stats_ui_elements["stats_return_rect"].collidepoint(event.pos):
+                self.clicked_return = True
+        if event.type == pygame.MOUSEBUTTONUP:
+            if self.stats_ui_elements["stats_return_rect"].collidepoint(event.pos) and self.clicked_return:
+                self.clicked_return = False
+                self.set_state(self.previous_state)
+                return
+            else:
+                self.clicked_return = False
     
     def _update(self):
         log_state()
@@ -307,6 +330,7 @@ class Game():
         if self.game_state == "MENU":
             self.screen.blit(self.menu_ui_elements["title_surface"], self.menu_ui_elements["title_rect"])
             self.screen.blit(self.menu_ui_elements["menu_play"], self.menu_ui_elements["menu_play_rect"])
+            self.screen.blit(self.menu_ui_elements["menu_stats"], self.menu_ui_elements["menu_stats_rect"])
             self.screen.blit(self.menu_ui_elements["menu_quit"], self.menu_ui_elements["menu_quit_rect"])
 
         elif self.game_state == "PLAYING":
@@ -323,7 +347,8 @@ class Game():
             self.screen.blit(self.game_over_ui_elements["menu_quit"], self.game_over_ui_elements["menu_quit_rect"])
 
         elif self.game_state == "STATS":
-            pass
+            self.screen.blit(self.stats_ui_elements["title_surface"], self.stats_ui_elements["title_rect"])
+            self.screen.blit(self.stats_ui_elements["stats_return"], self.stats_ui_elements["stats_return_rect"])
 
         else:
             raise Exception(f"Invalid game_state: {self.game_state}")
