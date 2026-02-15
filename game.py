@@ -1,5 +1,5 @@
 import pygame
-from constants import SCREEN_WIDTH, SCREEN_HEIGHT, SCORE_FONT, TITLE_FONT, MENU_FONT, SAVE_FILE
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, SCORE_FONT, TITLE_FONT, MENU_FONT, SAVE_FILE, SIZE_SMALL, SIZE_MEDIUM, SIZE_LARGE
 from logger import log_state, log_event
 from player import Player
 from asteroid import Asteroid
@@ -100,6 +100,47 @@ class Game():
             # self.stats_ui_elements["thing_rect"] = self.stats_ui_elements["thing"].get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4))
             self.stats_ui_elements["title_surface"] = TITLE_FONT.render("STATS", True, "White")
             self.stats_ui_elements["title_rect"] = self.stats_ui_elements["title_surface"].get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4))
+
+            # Total Stats
+            self.stats_ui_elements["combined_stats_surface"] = MENU_FONT.render("Combined Stats", True, "White")
+
+            self.stats_ui_elements["total_time_played_surface"] = SCORE_FONT.render(f"Time Played: {self.player_data.total_time_played}", True, "White")
+
+            self.stats_ui_elements["total_rounds_played_surface"] = SCORE_FONT.render(f"Rounds Played: {self.player_data.total_rounds_played}", True, "White")
+
+            self.stats_ui_elements["total_score_earned_surface"] = SCORE_FONT.render(f"Score Earned: {self.player_data.total_score_earned}", True, "White")
+
+            self.stats_ui_elements["total_shots_fired_surface"] = SCORE_FONT.render(f"Shots Fired: {self.player_data.total_shots_fired}", True, "White")
+
+            self.stats_ui_elements["total_roids_destroyed_surface"] = SCORE_FONT.render(f"Asteroids Destroyed: {self.player_data.total_asteroids_destroyed}", True, "White")
+
+            self.stats_ui_elements["total_small_destroyed_surface"] = SCORE_FONT.render(f"Small: {self.player_data.asteroids_destroyed_by_size[SIZE_SMALL]}", True, "White")
+
+            self.stats_ui_elements["total_medium_destroyed_surface"] = SCORE_FONT.render(f"Medium: {self.player_data.asteroids_destroyed_by_size[SIZE_MEDIUM]}", True, "White")
+
+            self.stats_ui_elements["total_large_destroyed_surface"] = SCORE_FONT.render(f"Large: {self.player_data.asteroids_destroyed_by_size[SIZE_LARGE]}", True, "White")
+
+            # Best Single Round Stats
+            self.stats_ui_elements["best_stats_surface"] = MENU_FONT.render("Best Single Round Stats", True, "White")
+
+            self.stats_ui_elements["round_time_played_surface"] = SCORE_FONT.render(f"Longest Round: {self.player_data.longest_round}", True, "White")
+
+            self.stats_ui_elements["best_score_surface"] = SCORE_FONT.render(f"Highest Score: {self.player_data.highest_single_round_score}", True, "White")
+
+            self.stats_ui_elements["best_shot_chain"] = SCORE_FONT.render(f"Longest Shot Chain: {self.player_data.longest_consecutive_shot_chain}", True, "White")
+
+            self.stats_ui_elements["best_roids_destroyed_surface"] = SCORE_FONT.render(f"Most Asteroids Destroyed: {self.player_data.most_asteroids_destroyed_single_round}", True, "White")
+
+            self.stats_ui_elements["best_small_destroyed_surface"] = SCORE_FONT.render(f"Small: {self.player_data.most_asteroids_destroyed_by_size_single_round[SIZE_SMALL]}", True, "White")
+
+            self.stats_ui_elements["best_medium_destroyed_surface"] = SCORE_FONT.render(f"Medium: {self.player_data.most_asteroids_destroyed_by_size_single_round[SIZE_MEDIUM]}", True, "White")
+
+            self.stats_ui_elements["best_large_destroyed_surface"] = SCORE_FONT.render(f"Large: {self.player_data.most_asteroids_destroyed_by_size_single_round[SIZE_LARGE]}", True, "White")
+
+            # Clickable Button
+            self.stats_ui_elements["stats_return"] = MENU_FONT.render("RETURN", True, "white")
+            self.stats_ui_elements["stats_return_rect"] = self.stats_ui_elements["stats_return"].get_rect(center=(SCREEN_WIDTH * (7 / 8), SCREEN_HEIGHT * (7 / 8)))
+
         
         else:
             raise Exception(f"Invalid game_state: {new_state}")
@@ -134,6 +175,9 @@ class Game():
 
             elif self.game_state == "GAME_OVER":
                 self._handle_game_over_input(event)
+
+            elif self.game_state == "STATS":
+                self._handle_stats_input(event)
 
             else:
                 raise Exception(f"Invalid game_state: {self.game_state}")
@@ -200,6 +244,9 @@ class Game():
             else:
                 self.clicked_play = False
                 self.clicked_quit = False
+
+    def _handle_stats_input(self, event):
+        pass
     
     def _update(self):
         log_state()
@@ -246,6 +293,9 @@ class Game():
         elif self.game_state == "GAME_OVER":
             pass
 
+        elif self.game_state == "STATS":
+            pass
+
         else:
             raise Exception(f"Invalid game_state: {self.game_state}")
 
@@ -271,6 +321,9 @@ class Game():
             self.screen.blit(self.game_over_ui_elements["final_score_surface"], self.game_over_ui_elements["final_score_rect"])
             self.screen.blit(self.game_over_ui_elements["menu_play"], self.game_over_ui_elements["menu_play_rect"])
             self.screen.blit(self.game_over_ui_elements["menu_quit"], self.game_over_ui_elements["menu_quit_rect"])
+
+        elif self.game_state == "STATS":
+            pass
 
         else:
             raise Exception(f"Invalid game_state: {self.game_state}")
