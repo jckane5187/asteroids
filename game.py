@@ -95,9 +95,13 @@ class Game():
             self.game_over_ui_elements["menu_play"] = MENU_FONT.render("PLAY", True, "white")
             self.game_over_ui_elements["menu_play_rect"] = self.game_over_ui_elements["menu_play"].get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2))
 
+            self.game_over_ui_elements["menu_stats"] = MENU_FONT.render("STATS", True, "white")
+            self.game_over_ui_elements["menu_stats_rect"] = self.menu_ui_elements["menu_stats"].get_rect(centerx=(SCREEN_WIDTH / 2))
+            self.game_over_ui_elements["menu_stats_rect"].top = self.menu_ui_elements["menu_play_rect"].bottom + 36
+
             self.game_over_ui_elements["menu_quit"] = MENU_FONT.render("QUIT", True, "white")
             self.game_over_ui_elements["menu_quit_rect"] = self.game_over_ui_elements["menu_quit"].get_rect(centerx=(SCREEN_WIDTH / 2))
-            self.game_over_ui_elements["menu_quit_rect"].top = self.game_over_ui_elements["menu_play_rect"].bottom + 36
+            self.game_over_ui_elements["menu_quit_rect"].top = self.game_over_ui_elements["menu_stats_rect"].bottom + 36
 
         elif new_state == "STATS": # depending on the size, this may require the ability to scroll through through the stats. I will initially try to keep it
             # to a small enough area, but need to be prepared to either learn how to do it, or download a library to handle it for me
@@ -106,47 +110,79 @@ class Game():
             # self.stats_ui_elements["thing"] = font_constant.render("WORD", True, "White")
             # self.stats_ui_elements["thing_rect"] = self.stats_ui_elements["thing"].get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4))
             self.stats_ui_elements["title_surface"] = TITLE_FONT.render("STATS", True, "White")
-            self.stats_ui_elements["title_rect"] = self.stats_ui_elements["title_surface"].get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4))
+            self.stats_ui_elements["title_rect"] = self.stats_ui_elements["title_surface"].get_rect(center=(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 8))
 
             # Total Stats
             self.stats_ui_elements["combined_stats_surface"] = MENU_FONT.render("Combined Stats", True, "White")
+            self.stats_ui_elements["combined_stats_surface_rect"] = self.stats_ui_elements["combined_stats_surface"].get_rect(center=(SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4))
 
-            self.stats_ui_elements["total_time_played_surface"] = SCORE_FONT.render(f"Time Played: {self.player_data.total_time_played}", True, "White")
+            self.stats_ui_elements["total_time_played_surface"] = SCORE_FONT.render(f"Time Played: {self.player_data.total_time_played:.0f}", True, "White")
+            self.stats_ui_elements["total_time_played_surface_rect"] = self.stats_ui_elements["total_time_played_surface"].get_rect(centerx=(SCREEN_WIDTH / 4))
+            self.stats_ui_elements["total_time_played_surface_rect"].top = self.stats_ui_elements["combined_stats_surface_rect"].bottom + 12
 
             self.stats_ui_elements["total_rounds_played_surface"] = SCORE_FONT.render(f"Rounds Played: {self.player_data.total_rounds_played}", True, "White")
+            self.stats_ui_elements["total_rounds_played_surface_rect"] = self.stats_ui_elements["total_rounds_played_surface"].get_rect(centerx=(SCREEN_WIDTH / 4))
+            self.stats_ui_elements["total_rounds_played_surface_rect"].top = self.stats_ui_elements["total_time_played_surface_rect"].bottom + 12
 
-            self.stats_ui_elements["total_score_earned_surface"] = SCORE_FONT.render(f"Score Earned: {self.player_data.total_score_earned}", True, "White")
+            self.stats_ui_elements["total_score_earned_surface"] = SCORE_FONT.render(f"Score Earned: {self.player_data.total_score_earned:.0f}", True, "White")
+            self.stats_ui_elements["total_score_earned_surface_rect"] = self.stats_ui_elements["total_score_earned_surface"].get_rect(centerx=(SCREEN_WIDTH / 4))
+            self.stats_ui_elements["total_score_earned_surface_rect"].top = self.stats_ui_elements["total_rounds_played_surface_rect"].bottom + 12
 
             self.stats_ui_elements["total_shots_fired_surface"] = SCORE_FONT.render(f"Shots Fired: {self.player_data.total_shots_fired}", True, "White")
+            self.stats_ui_elements["total_shots_fired_surface_rect"] = self.stats_ui_elements["total_shots_fired_surface"].get_rect(centerx=(SCREEN_WIDTH / 4))
+            self.stats_ui_elements["total_shots_fired_surface_rect"].top = self.stats_ui_elements["total_score_earned_surface_rect"].bottom + 12
 
             self.stats_ui_elements["total_roids_destroyed_surface"] = SCORE_FONT.render(f"Asteroids Destroyed: {self.player_data.total_asteroids_destroyed}", True, "White")
+            self.stats_ui_elements["total_roids_destroyed_surface_rect"] = self.stats_ui_elements["total_roids_destroyed_surface"].get_rect(centerx=(SCREEN_WIDTH / 4))
+            self.stats_ui_elements["total_roids_destroyed_surface_rect"].top = self.stats_ui_elements["total_shots_fired_surface_rect"].bottom + 12
 
             self.stats_ui_elements["total_small_destroyed_surface"] = SCORE_FONT.render(f"Small: {self.player_data.asteroids_destroyed_by_size[SIZE_SMALL]}", True, "White")
+            self.stats_ui_elements["total_small_destroyed_surface_rect"] = self.stats_ui_elements["total_small_destroyed_surface"].get_rect(centerx=(SCREEN_WIDTH / 4))
+            self.stats_ui_elements["total_small_destroyed_surface_rect"].top = self.stats_ui_elements["total_roids_destroyed_surface_rect"].bottom + 12
 
             self.stats_ui_elements["total_medium_destroyed_surface"] = SCORE_FONT.render(f"Medium: {self.player_data.asteroids_destroyed_by_size[SIZE_MEDIUM]}", True, "White")
+            self.stats_ui_elements["total_medium_destroyed_surface_rect"] = self.stats_ui_elements["total_medium_destroyed_surface"].get_rect(centerx=(SCREEN_WIDTH / 4))
+            self.stats_ui_elements["total_medium_destroyed_surface_rect"].top = self.stats_ui_elements["total_small_destroyed_surface_rect"].bottom + 12
 
             self.stats_ui_elements["total_large_destroyed_surface"] = SCORE_FONT.render(f"Large: {self.player_data.asteroids_destroyed_by_size[SIZE_LARGE]}", True, "White")
+            self.stats_ui_elements["total_large_destroyed_surface_rect"] = self.stats_ui_elements["total_large_destroyed_surface"].get_rect(centerx=(SCREEN_WIDTH / 4))
+            self.stats_ui_elements["total_large_destroyed_surface_rect"].top = self.stats_ui_elements["total_medium_destroyed_surface_rect"].bottom + 12
 
             # Best Single Round Stats
             self.stats_ui_elements["best_stats_surface"] = MENU_FONT.render("Best Single Round Stats", True, "White")
+            self.stats_ui_elements["best_stats_surface_rect"] = self.stats_ui_elements["best_stats_surface"].get_rect(center=(SCREEN_WIDTH * 3 / 4, SCREEN_HEIGHT / 4))
 
-            self.stats_ui_elements["round_time_played_surface"] = SCORE_FONT.render(f"Longest Round: {self.player_data.longest_round}", True, "White")
+            self.stats_ui_elements["round_time_played_surface"] = SCORE_FONT.render(f"Longest Round: {self.player_data.longest_round:.0f}", True, "White")
+            self.stats_ui_elements["round_time_played_surface_rect"] = self.stats_ui_elements["round_time_played_surface"].get_rect(center=(SCREEN_WIDTH * 3 / 4, SCREEN_HEIGHT / 4))
+            self.stats_ui_elements["round_time_played_surface_rect"].top = self.stats_ui_elements["best_stats_surface_rect"].bottom + 12
 
-            self.stats_ui_elements["best_score_surface"] = SCORE_FONT.render(f"Highest Score: {self.player_data.highest_single_round_score}", True, "White")
+            self.stats_ui_elements["best_score_surface"] = SCORE_FONT.render(f"Highest Score: {self.player_data.highest_single_round_score:.0f}", True, "White")
+            self.stats_ui_elements["best_score_surface_rect"] = self.stats_ui_elements["best_score_surface"].get_rect(center=(SCREEN_WIDTH * 3 / 4, SCREEN_HEIGHT / 4))
+            self.stats_ui_elements["best_score_surface_rect"].top = self.stats_ui_elements["round_time_played_surface_rect"].bottom + 12
 
             self.stats_ui_elements["best_shot_chain"] = SCORE_FONT.render(f"Longest Shot Chain: {self.player_data.longest_consecutive_shot_chain}", True, "White")
+            self.stats_ui_elements["best_shot_chain_rect"] = self.stats_ui_elements["best_shot_chain"].get_rect(center=(SCREEN_WIDTH * 3 / 4, SCREEN_HEIGHT / 4))
+            self.stats_ui_elements["best_shot_chain_rect"].top = self.stats_ui_elements["best_score_surface_rect"].bottom + 12
 
             self.stats_ui_elements["best_roids_destroyed_surface"] = SCORE_FONT.render(f"Most Asteroids Destroyed: {self.player_data.most_asteroids_destroyed_single_round}", True, "White")
+            self.stats_ui_elements["best_roids_destroyed_surface_rect"] = self.stats_ui_elements["best_roids_destroyed_surface"].get_rect(center=(SCREEN_WIDTH * 3 / 4, SCREEN_HEIGHT / 4))
+            self.stats_ui_elements["best_roids_destroyed_surface_rect"].top = self.stats_ui_elements["best_shot_chain_rect"].bottom + 12
 
             self.stats_ui_elements["best_small_destroyed_surface"] = SCORE_FONT.render(f"Small: {self.player_data.most_asteroids_destroyed_by_size_single_round[SIZE_SMALL]}", True, "White")
+            self.stats_ui_elements["best_small_destroyed_surface_rect"] = self.stats_ui_elements["best_small_destroyed_surface"].get_rect(center=(SCREEN_WIDTH * 3 / 4, SCREEN_HEIGHT / 4))
+            self.stats_ui_elements["best_small_destroyed_surface_rect"].top = self.stats_ui_elements["best_roids_destroyed_surface_rect"].bottom + 12
 
             self.stats_ui_elements["best_medium_destroyed_surface"] = SCORE_FONT.render(f"Medium: {self.player_data.most_asteroids_destroyed_by_size_single_round[SIZE_MEDIUM]}", True, "White")
+            self.stats_ui_elements["best_medium_destroyed_surface_rect"] = self.stats_ui_elements["best_medium_destroyed_surface"].get_rect(center=(SCREEN_WIDTH * 3 / 4, SCREEN_HEIGHT / 4))
+            self.stats_ui_elements["best_medium_destroyed_surface_rect"].top = self.stats_ui_elements["best_small_destroyed_surface_rect"].bottom + 12
 
             self.stats_ui_elements["best_large_destroyed_surface"] = SCORE_FONT.render(f"Large: {self.player_data.most_asteroids_destroyed_by_size_single_round[SIZE_LARGE]}", True, "White")
+            self.stats_ui_elements["best_large_destroyed_surface_rect"] = self.stats_ui_elements["best_large_destroyed_surface"].get_rect(center=(SCREEN_WIDTH * 3 / 4, SCREEN_HEIGHT / 4))
+            self.stats_ui_elements["best_large_destroyed_surface_rect"].top = self.stats_ui_elements["best_medium_destroyed_surface_rect"].bottom + 12
 
             # Clickable Button
             self.stats_ui_elements["stats_return"] = MENU_FONT.render("RETURN", True, "white")
-            self.stats_ui_elements["stats_return_rect"] = self.stats_ui_elements["stats_return"].get_rect(center=(SCREEN_WIDTH * (7 / 8), SCREEN_HEIGHT * (7 / 8)))
+            self.stats_ui_elements["stats_return_rect"] = self.stats_ui_elements["stats_return"].get_rect(center=(SCREEN_WIDTH * (7 / 8), SCREEN_HEIGHT * (9 / 10)))
             
         
         else:
@@ -245,6 +281,8 @@ class Game():
                 self.clicked_quit = True
             elif self.game_over_ui_elements["menu_play_rect"].collidepoint(event.pos):
                 self.clicked_play = True
+            elif self.game_over_ui_elements["menu_stats_rect"].collidepoint(event.pos):
+                self.clicked_stats = True
         if event.type == pygame.MOUSEBUTTONUP:
             if self.game_over_ui_elements["menu_quit_rect"].collidepoint(event.pos) and self.clicked_quit:
                 self.clicked_quit = False
@@ -255,8 +293,12 @@ class Game():
                 for roid in self.asteroids:
                     roid.kill()
                 self.set_state("PLAYING")
+            elif self.game_over_ui_elements["menu_stats_rect"].collidepoint(event.pos) and self.clicked_stats:
+                self.clicked_stats = False
+                self.set_state("STATS")
             else:
                 self.clicked_play = False
+                self.clicked_stats = False
                 self.clicked_quit = False
 
     def _handle_stats_input(self, event):
@@ -344,11 +386,29 @@ class Game():
             self.screen.blit(self.game_over_ui_elements["title_surface"], self.game_over_ui_elements["title_rect"])
             self.screen.blit(self.game_over_ui_elements["final_score_surface"], self.game_over_ui_elements["final_score_rect"])
             self.screen.blit(self.game_over_ui_elements["menu_play"], self.game_over_ui_elements["menu_play_rect"])
+            self.screen.blit(self.game_over_ui_elements["menu_stats"], self.game_over_ui_elements["menu_stats_rect"])
             self.screen.blit(self.game_over_ui_elements["menu_quit"], self.game_over_ui_elements["menu_quit_rect"])
 
         elif self.game_state == "STATS":
             self.screen.blit(self.stats_ui_elements["title_surface"], self.stats_ui_elements["title_rect"])
             self.screen.blit(self.stats_ui_elements["stats_return"], self.stats_ui_elements["stats_return_rect"])
+            self.screen.blit(self.stats_ui_elements["combined_stats_surface"], self.stats_ui_elements["combined_stats_surface_rect"])
+            self.screen.blit(self.stats_ui_elements["best_stats_surface"], self.stats_ui_elements["best_stats_surface_rect"])
+            self.screen.blit(self.stats_ui_elements["total_time_played_surface"], self.stats_ui_elements["total_time_played_surface_rect"])
+            self.screen.blit(self.stats_ui_elements["total_rounds_played_surface"], self.stats_ui_elements["total_rounds_played_surface_rect"])
+            self.screen.blit(self.stats_ui_elements["total_score_earned_surface"], self.stats_ui_elements["total_score_earned_surface_rect"])
+            self.screen.blit(self.stats_ui_elements["total_shots_fired_surface"], self.stats_ui_elements["total_shots_fired_surface_rect"])
+            self.screen.blit(self.stats_ui_elements["total_roids_destroyed_surface"], self.stats_ui_elements["total_roids_destroyed_surface_rect"])
+            self.screen.blit(self.stats_ui_elements["total_small_destroyed_surface"], self.stats_ui_elements["total_small_destroyed_surface_rect"])
+            self.screen.blit(self.stats_ui_elements["total_medium_destroyed_surface"], self.stats_ui_elements["total_medium_destroyed_surface_rect"])
+            self.screen.blit(self.stats_ui_elements["total_large_destroyed_surface"], self.stats_ui_elements["total_large_destroyed_surface_rect"])
+            self.screen.blit(self.stats_ui_elements["round_time_played_surface"], self.stats_ui_elements["round_time_played_surface_rect"])
+            self.screen.blit(self.stats_ui_elements["best_score_surface"], self.stats_ui_elements["best_score_surface_rect"])
+            self.screen.blit(self.stats_ui_elements["best_shot_chain"], self.stats_ui_elements["best_shot_chain_rect"])
+            self.screen.blit(self.stats_ui_elements["best_roids_destroyed_surface"], self.stats_ui_elements["best_roids_destroyed_surface_rect"])
+            self.screen.blit(self.stats_ui_elements["best_small_destroyed_surface"], self.stats_ui_elements["best_small_destroyed_surface_rect"])
+            self.screen.blit(self.stats_ui_elements["best_medium_destroyed_surface"], self.stats_ui_elements["best_medium_destroyed_surface_rect"])
+            self.screen.blit(self.stats_ui_elements["best_large_destroyed_surface"], self.stats_ui_elements["best_large_destroyed_surface_rect"])
 
         else:
             raise Exception(f"Invalid game_state: {self.game_state}")
