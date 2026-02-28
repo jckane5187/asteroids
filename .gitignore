@@ -13,3 +13,6 @@ player_data.json
 
 # Virtual environments
 .venv
+
+#Ignore sandboxes and test scripts
+sandbox.py
