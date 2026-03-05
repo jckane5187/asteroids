@@ -1,6 +1,6 @@
 import pygame
 from circleshape import CircleShape
-from constants import PLAYER_RADIUS, LINE_WIDTH, PLAYER_TURN_SPEED, PLAYER_SPEED, PLAYER_SHOOT_SPEED, SHOT_RADIUS, PLAYER_SHOOT_COOLDOWN_SECONDS, PLAYER_MAX_VELOCITY, PLAYER_MIN_VELOCITY
+from constants import PLAYER_RADIUS, LINE_WIDTH, PLAYER_TURN_SPEED, PLAYER_SPEED, PLAYER_SHOOT_SPEED, SHOT_RADIUS, PLAYER_SHOOT_COOLDOWN_SECONDS, PLAYER_MAX_VELOCITY
 from shot import Shot
 from utils import position_wrap
 
@@ -9,7 +9,7 @@ class Player(CircleShape):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
         self.shot_cooldown = 0
-        self.velocity = 0
+        self.velocity = pygame.Vector2(0, 0)
         self.rotating_left = False
         self.rotating_right = False
         self.accelerating_forward = False
@@ -19,8 +19,8 @@ class Player(CircleShape):
     
     # in the Player class
     def triangle(self):
-        forward = pygame.Vector2(0, 1).rotate(self.rotation)
-        right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius / 1.5
+        forward = pygame.Vector2(0, -1).rotate(self.rotation)
+        right = pygame.Vector2(0, -1).rotate(self.rotation + 90) * self.radius / 1.5
         a = self.position + forward * self.radius
         b = self.position - forward * self.radius - right
         c = self.position - forward * self.radius + right
@@ -44,10 +44,10 @@ class Player(CircleShape):
             self.rotate(dt)
 
         if self.accelerating_forward:
-            self.change_velocity(dt)
+            self.accelerate(dt)
 
         if self.accelerating_backward:
-            self.change_velocity(-dt)
+            self.accelerate(-dt)
 
         if self.shooting:
             if self.shot_cooldown > 0:
@@ -59,23 +59,19 @@ class Player(CircleShape):
         self.position.x, self.position.y = position_wrap(self.position.x, self.position.y)
 
     def move(self, dt):
-        unit_vector = pygame.Vector2(0, 1)
-        rotated_vector = unit_vector.rotate(self.rotation)
-        rotated_with_speed = rotated_vector * PLAYER_SPEED * dt * self.velocity
-        self.position += rotated_with_speed
+        self.position += self.velocity
 
-    def change_velocity(self, dt):
-        if self.velocity <= PLAYER_MAX_VELOCITY and self.velocity >= PLAYER_MIN_VELOCITY:
-            self.velocity += dt
-        if self.velocity > PLAYER_MAX_VELOCITY:
-            self.velocity = PLAYER_MAX_VELOCITY
-        elif self.velocity < PLAYER_MIN_VELOCITY:
-            self.velocity = PLAYER_MIN_VELOCITY
-        print(self.velocity)
+    def accelerate(self, dt):
+        unit_vector = pygame.Vector2(0, -1)
+        rotated_vector = unit_vector.rotate(self.rotation)
+        rotated_with_speed = rotated_vector * PLAYER_SPEED * dt
+        self.velocity += rotated_with_speed
+        if self.velocity.length() > PLAYER_MAX_VELOCITY:
+            self.velocity.scale_to_length(PLAYER_MAX_VELOCITY)
 
     def shoot(self):
         bullet = Shot(self.position, self.position, SHOT_RADIUS)
-        base_vel = pygame.Vector2(0, 1)
+        base_vel = pygame.Vector2(0, -1)
         rotated_vel = base_vel.rotate(self.rotation)
         bullet.velocity = rotated_vel * PLAYER_SHOOT_SPEED
     
